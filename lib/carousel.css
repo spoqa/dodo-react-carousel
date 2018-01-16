@@ -1,0 +1,24 @@
+.carouselWindow {
+    position: relative;
+    padding: 0;
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+}
+.carousel {
+    position: absolute;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: stretch;
+
+    & > * {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        flex: 0 0 auto;
+    }
+}
