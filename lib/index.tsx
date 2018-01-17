@@ -1,12 +1,12 @@
-import * as React from 'react';
 import * as classNames from 'classnames';
+import * as React from 'react';
 
 import {
     carousel,
     carouselWindow,
-    transitionActive,
     toLeft,
     toRight,
+    transitionActive,
 } from './carousel.css';
 
 
@@ -30,13 +30,57 @@ interface State {
 
 
 export default class Carousel extends React.Component<Props, State> {
-    carouselWindow: HTMLElement | null = null;
-    carousel: HTMLElement | null = null;
+    private carouselWindow: HTMLElement | null = null;
+    private carousel: HTMLElement | null = null;
 
-    startDrag = (e: React.MouseEvent<HTMLDivElement>) => {
+
+    constructor(props: Props) {
+        super(props);
+
+        this.state = {
+            currentIndex: 0,
+            targetIndex: 0,
+            slideTo: null,
+            transition: false,
+            drag: null,
+        };
+    }
+
+    public render() {
+        const carouselClassList = classNames({
+            [carousel]: true,
+            [transitionActive]: this.state.transition,
+            [toLeft]: this.state.slideTo === 'left',
+            [toRight]: this.state.slideTo === 'right',
+        });
+        const dragStyle: { left?: string } = {};
+        if (this.state.drag !== null) {
+            const { base } = this.state.drag;
+            dragStyle.left = `${(-base - this.dragDelta - 2) * 100}%`;
+        }
+
+        return (
+            <div className={carouselWindow}
+                 onMouseDown={this.startDrag}
+                 onMouseMove={this.updateDrag}
+                 onMouseUp={this.endDrag}
+                 onMouseLeave={this.mouseLeave}
+                 ref={el => this.carouselWindow = el}>
+                <div className={carouselClassList}
+                     style={dragStyle}
+                     onTransitionEnd={this.processStable}
+                     ref={el => this.carousel = el}>
+                    {this.displayItemList}
+                </div>
+            </div>
+        );
+    }
+
+
+    private startDrag = (e: React.MouseEvent<HTMLDivElement>) => {
         e.preventDefault();
         if (this.state.drag !== null) {
-            console.error('this.state.drag is not null when mouse goes down');
+            // console.error('this.state.drag is not null when mouse goes down');
         }
         let base = this.currentSlidePos;
         if (base < -0.5) {
@@ -53,11 +97,11 @@ export default class Carousel extends React.Component<Props, State> {
                 base: base,
                 start: e.clientX,
                 current: e.clientX,
-            }
+            },
         });
     };
 
-    updateDrag = (e: React.MouseEvent<HTMLDivElement>) => {
+    private updateDrag = (e: React.MouseEvent<HTMLDivElement>) => {
         e.preventDefault();
         if (this.state.drag === null) {
             return;
@@ -65,10 +109,10 @@ export default class Carousel extends React.Component<Props, State> {
         this.setState({ drag: { ...this.state.drag, current: e.clientX } });
     };
 
-    endDrag = (e: React.MouseEvent<HTMLDivElement>) => {
+    private endDrag = (e: React.MouseEvent<HTMLDivElement>) => {
         e.preventDefault();
         if (this.state.drag === null) {
-            console.error('this.state.drag is null when mouse goes up');
+            // console.error('this.state.drag is null when mouse goes up');
             return;
         }
         if (this.dragDelta < -0.2) {
@@ -79,7 +123,7 @@ export default class Carousel extends React.Component<Props, State> {
         this.setState({ transition: true, drag: null });
     };
 
-    mouseLeave = (e: React.MouseEvent<HTMLDivElement>) => {
+    private mouseLeave = (e: React.MouseEvent<HTMLDivElement>) => {
         e.preventDefault();
         if (this.state.drag === null) {
             return;
@@ -92,25 +136,13 @@ export default class Carousel extends React.Component<Props, State> {
         this.setState({ transition: true, drag: null });
     };
 
-    processStable = () => {
+    private processStable = () => {
         this.setState({
             currentIndex: this.state.targetIndex,
             slideTo: null,
             transition: false,
         });
     };
-
-    constructor(props: Props) {
-        super(props);
-
-        this.state = {
-            currentIndex: 0,
-            targetIndex: 0,
-            slideTo: null,
-            transition: false,
-            drag: null,
-        };
-    }
 
     get displayItemList() {
         const { children } = this.props;
@@ -152,7 +184,7 @@ export default class Carousel extends React.Component<Props, State> {
         return -((current - start) / this.carouselWindow.offsetWidth);
     }
 
-    slide(to: 'left' | 'right') {
+    private slide(to: 'left' | 'right') {
         const { children } = this.props;
         const len = children ? children.length : 0;
         let newIndex = this.state.currentIndex;
@@ -164,42 +196,16 @@ export default class Carousel extends React.Component<Props, State> {
                 newIndex++;
                 break;
         }
-        if (newIndex < 0) newIndex += len;
-        if (newIndex >= len) newIndex -= len;
+        if (newIndex < 0) {
+            newIndex += len;
+        }
+        if (newIndex >= len) {
+            newIndex -= len;
+        }
         this.setState({
             targetIndex: newIndex,
             slideTo: to,
             transition: true,
         });
-    }
-
-    render() {
-        const carouselClassList = classNames({
-            [carousel]: true,
-            [transitionActive]: this.state.transition,
-            [toLeft]: this.state.slideTo === 'left',
-            [toRight]: this.state.slideTo === 'right',
-        });
-        const dragStyle: { left?: string } = {};
-        if (this.state.drag !== null) {
-            const { base } = this.state.drag;
-            dragStyle.left = `${(-base - this.dragDelta - 2) * 100}%`;
-        }
-
-        return (
-            <div className={carouselWindow}
-                 onMouseDown={this.startDrag}
-                 onMouseMove={this.updateDrag}
-                 onMouseUp={this.endDrag}
-                 onMouseLeave={this.mouseLeave}
-                 ref={el => this.carouselWindow = el}>
-                <div className={carouselClassList}
-                     style={dragStyle}
-                     onTransitionEnd={this.processStable}
-                     ref={el => this.carousel = el}>
-                    {this.displayItemList}
-                </div>
-            </div>
-        );
     }
 }
