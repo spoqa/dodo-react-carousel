@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 
-import Carousel from '../lib';
+import { Carousel } from '../lib';
 import { container } from './index.css';
 
 const content = document.getElementById('content');

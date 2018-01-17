@@ -29,7 +29,7 @@ interface State {
 }
 
 
-export default class Carousel extends React.Component<Props, State> {
+export class Carousel extends React.Component<Props, State> {
     private carouselWindow: HTMLElement | null = null;
     private carousel: HTMLElement | null = null;
 

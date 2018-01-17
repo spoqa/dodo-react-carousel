@@ -2,7 +2,8 @@
   "name": "dodo-react-carousel",
   "version": "0.1.0",
   "description": "A simple React carousel component",
-  "main": "dist/main.js",
+  "main": "dist/index.js",
+  "types": "index.d.ts",
   "author": "Tirr",
   "license": "MIT OR Apache-2.0",
   "scripts": {
@@ -12,12 +13,12 @@
     "typecheck": "tsc --noEmit -p ."
   },
   "dependencies": {
+    "@types/react": "^16.0.34",
     "classnames": "^2.2.5",
     "react": "^16.2.0"
   },
   "devDependencies": {
     "@types/classnames": "^2.2.3",
-    "@types/react": "^16.0.34",
     "@types/react-dom": "^16.0.3",
     "babel-preset-env": "^1.6.1",
     "babel-preset-react": "^6.24.1",
