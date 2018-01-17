@@ -9,14 +9,17 @@ import {
     toRight,
 } from './carousel.css';
 
+
 interface Props {
     children?: any;
 }
+
 interface DragState {
     base: number;
     start: number;
     current: number;
 }
+
 interface State {
     currentIndex: number;
     targetIndex: number;
@@ -25,9 +28,11 @@ interface State {
     drag: DragState | null;
 }
 
-export class Carousel extends React.Component<Props, State> {
+
+export default class Carousel extends React.Component<Props, State> {
     carouselWindow: HTMLElement | null = null;
     carousel: HTMLElement | null = null;
+
     startDrag = (e: React.MouseEvent<HTMLDivElement>) => {
         e.preventDefault();
         if (this.state.drag !== null) {
@@ -51,6 +56,7 @@ export class Carousel extends React.Component<Props, State> {
             }
         });
     };
+
     updateDrag = (e: React.MouseEvent<HTMLDivElement>) => {
         e.preventDefault();
         if (this.state.drag === null) {
@@ -58,6 +64,7 @@ export class Carousel extends React.Component<Props, State> {
         }
         this.setState({ drag: { ...this.state.drag, current: e.clientX } });
     };
+
     endDrag = (e: React.MouseEvent<HTMLDivElement>) => {
         e.preventDefault();
         if (this.state.drag === null) {
@@ -71,6 +78,7 @@ export class Carousel extends React.Component<Props, State> {
         }
         this.setState({ transition: true, drag: null });
     };
+
     mouseLeave = (e: React.MouseEvent<HTMLDivElement>) => {
         e.preventDefault();
         if (this.state.drag === null) {
@@ -83,6 +91,7 @@ export class Carousel extends React.Component<Props, State> {
         }
         this.setState({ transition: true, drag: null });
     };
+
     processStable = () => {
         this.setState({
             currentIndex: this.state.targetIndex,

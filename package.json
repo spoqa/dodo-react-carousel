@@ -7,7 +7,7 @@
   "license": "MIT OR Apache-2.0",
   "scripts": {
     "build": "parcel build lib/main.tsx",
-    "start": "parcel src/index.html",
+    "start": "parcel example/index.html",
     "typecheck": "tsc --noEmit -p ."
   },
   "dependencies": {
