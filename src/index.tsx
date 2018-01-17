@@ -1,14 +1,6 @@
 import * as classNames from 'classnames';
 import * as React from 'react';
 
-import {
-    carousel,
-    carouselWindow,
-    toLeft,
-    toRight,
-    transitionActive,
-} from './carousel.css';
-
 
 interface Props {
     children?: any;
@@ -48,10 +40,10 @@ export class Carousel extends React.Component<Props, State> {
 
     public render() {
         const carouselClassList = classNames({
-            [carousel]: true,
-            [transitionActive]: this.state.transition,
-            [toLeft]: this.state.slideTo === 'left',
-            [toRight]: this.state.slideTo === 'right',
+            'dodo-carousel': true,
+            'dodo-transition-active': this.state.transition,
+            'dodo-to-left': this.state.slideTo === 'left',
+            'dodo-to-right': this.state.slideTo === 'right',
         });
         const dragStyle: { left?: string } = {};
         if (this.state.drag !== null) {
@@ -60,7 +52,7 @@ export class Carousel extends React.Component<Props, State> {
         }
 
         return (
-            <div className={carouselWindow}
+            <div className="dodo-carousel-window"
                  onMouseDown={this.startDrag}
                  onMouseMove={this.updateDrag}
                  onMouseUp={this.endDrag}

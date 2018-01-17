@@ -2,12 +2,12 @@
   "name": "@spoqa/react-carousel",
   "version": "0.1.0",
   "description": "A simple React carousel component",
-  "main": "dist/index.js",
+  "main": "lib/index.js",
   "types": "index.d.ts",
   "author": "Tirr",
   "license": "MIT OR Apache-2.0",
   "scripts": {
-    "build": "parcel build lib/main.tsx",
+    "build": "tsc -p tsconfig.dist.json",
     "start": "parcel example/index.html",
     "lint": "tslint --project .",
     "typecheck": "tsc --noEmit -p ."
@@ -23,8 +23,6 @@
     "babel-preset-env": "^1.6.1",
     "babel-preset-react": "^6.24.1",
     "parcel-bundler": "^1.4.1",
-    "postcss-cssnext": "^3.0.2",
-    "postcss-modules": "^1.1.0",
     "react-dom": "^16.2.0",
     "tslint": "^5.9.1",
     "typescript": "^2.6.2"

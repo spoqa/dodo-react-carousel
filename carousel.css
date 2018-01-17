@@ -1,11 +1,11 @@
-.carouselWindow {
+.dodo-carousel-window {
     position: relative;
     padding: 0;
     overflow: hidden;
     width: 100%;
     height: 100%;
 }
-.carousel {
+.dodo-carousel {
     position: absolute;
     padding: 0;
     width: 500%;
@@ -15,21 +15,19 @@
     display: flex;
     flex-wrap: nowrap;
     align-items: stretch;
-
-    & > * {
-        margin: 0;
-        padding: 0;
-        width: 20%;
-        flex: 0 0 auto;
-    }
 }
-.transitionActive {
+.dodo-carousel > * {
+    margin: 0;
+    padding: 0;
+    width: 20%;
+    flex: 0 0 auto;
+}
+.dodo-transition-active {
     transition: left 1s ease-out;
-
-    &.toLeft {
-        left: -100%;
-    }
-    &.toRight {
-        left: -300%;
-    }
+}
+.dodo-transition-active.dodo-to-left {
+    left: -100%;
+}
+.dodo-transition-active.dodo-to-right {
+    left: -300%;
 }

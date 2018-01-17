@@ -2,11 +2,13 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 
 import { Carousel } from '../lib';
-import { container } from './index.css';
+
+import '../carousel.css';
+import './index.css';
 
 const content = document.getElementById('content');
 ReactDOM.render(
-    <div className={container}>
+    <div className="container">
         <Carousel>
             <div>
                 Hello, world!

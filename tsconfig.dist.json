@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "jsx": "react",
+    "lib": ["es6", "dom"],
+    "moduleResolution": "node",
+    "noImplicitAny": true,
+    "outDir": "./lib/",
+    "sourceMap": true,
+    "strictNullChecks": true,
+    "target": "es5"
+  },
+  "include": [
+    "src/**/*"
+  ]
+}
