@@ -1,5 +1,5 @@
 {
-  "name": "dodo-react-carousel",
+  "name": "@spoqa/react-carousel",
   "version": "0.1.0",
   "description": "A simple React carousel component",
   "main": "dist/index.js",
