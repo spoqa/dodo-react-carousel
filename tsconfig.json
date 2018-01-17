@@ -2,7 +2,9 @@
   "compilerOptions": {
     "sourceMap": true,
     "noImplicitAny": true,
+    "strictNullChecks": true,
     "target": "es6",
+    "lib": ["es6", "dom"],
     "jsx": "preserve"
   }
 }
