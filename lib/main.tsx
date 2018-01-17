@@ -62,7 +62,19 @@ export class Carousel extends React.Component<{}, State> {
         }
         this.setState({ transition: true, drag: null });
     };
-    recalculate = (e) => {
+    mouseLeave = (e) => {
+        e.preventDefault();
+        if (this.state.drag === null) {
+            return;
+        }
+        if (this.dragDelta < -0.2) {
+            this.slide('left');
+        } else if (this.dragDelta > 0.2) {
+            this.slide('right');
+        }
+        this.setState({ transition: true, drag: null });
+    };
+    processStable = (e) => {
         this.setState({
             currentIndex: this.state.targetIndex,
             slideTo: null,
@@ -153,11 +165,12 @@ export class Carousel extends React.Component<{}, State> {
                  onMouseDown={this.startDrag}
                  onMouseMove={this.updateDrag}
                  onMouseUp={this.endDrag}
-                 ref={el => { this.carouselWindow = el; }}>
+                 onMouseLeave={this.mouseLeave}
+                 ref={el => this.carouselWindow = el}>
                 <div className={carouselClassList}
                      style={dragStyle}
-                     onTransitionEnd={this.recalculate}
-                     ref={el => { this.carousel = el; }}>
+                     onTransitionEnd={this.processStable}
+                     ref={el => this.carousel = el}>
                     {this.displayItemList}
                 </div>
             </div>
