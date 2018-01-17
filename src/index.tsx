@@ -7,6 +7,7 @@ interface Props {
 }
 
 interface DragState {
+    touch: any;
     base: number;
     start: number;
     current: number;
@@ -53,10 +54,14 @@ export class Carousel extends React.Component<Props, State> {
 
         return (
             <div className="dodo-carousel-window"
-                 onMouseDown={this.startDrag}
-                 onMouseMove={this.updateDrag}
-                 onMouseUp={this.endDrag}
+                 onMouseDown={this.mouseDown}
+                 onMouseMove={this.mouseMove}
+                 onMouseUp={this.mouseUp}
                  onMouseLeave={this.mouseLeave}
+                 onTouchStart={this.touchStart}
+                 onTouchMove={this.touchMove}
+                 onTouchEnd={this.touchEnd}
+                 onTouchCancel={this.touchCancel}
                  ref={el => this.carouselWindow = el}>
                 <div className={carouselClassList}
                      style={dragStyle}
@@ -69,50 +74,90 @@ export class Carousel extends React.Component<Props, State> {
     }
 
 
-    private startDrag = (e: React.MouseEvent<HTMLDivElement>) => {
-        e.preventDefault();
-        if (this.state.drag !== null) {
-            // console.error('this.state.drag is not null when mouse goes down');
-        }
+    private startDrag(x: number, touch: any) {
         let base = this.currentSlidePos;
-        if (base < -0.5) {
-            base += 1;
-            this.setState({ currentIndex: this.state.currentIndex - 1 });
-        } else if (base > 0.5) {
-            base -= 1;
-            this.setState({ currentIndex: this.state.currentIndex + 1 });
-        }
         this.setState({
+            targetIndex: this.state.currentIndex,
             slideTo: null,
             transition: false,
             drag: {
+                touch: touch,
                 base: base,
-                start: e.clientX,
-                current: e.clientX,
+                start: x,
+                current: x,
             },
         });
-    };
+    }
 
-    private updateDrag = (e: React.MouseEvent<HTMLDivElement>) => {
-        e.preventDefault();
+    private updateDrag(x: number) {
         if (this.state.drag === null) {
             return;
         }
-        this.setState({ drag: { ...this.state.drag, current: e.clientX } });
-    };
-
-    private endDrag = (e: React.MouseEvent<HTMLDivElement>) => {
-        e.preventDefault();
-        if (this.state.drag === null) {
-            // console.error('this.state.drag is null when mouse goes up');
-            return;
+        let base =
+            this.state.drag.base +
+            this.parameterizedDragDelta(this.state.drag.start, x);
+        let start = x;
+        if (base < -0.9) {
+            const idx = this.state.currentIndex - 1;
+            base += 1;
+            this.setState({ currentIndex: idx, targetIndex: idx });
+        } else if (base > 0.9) {
+            const idx = this.state.currentIndex + 1;
+            base -= 1;
+            this.setState({ currentIndex: idx, targetIndex: idx });
+        } else {
+            base = this.state.drag.base;
+            start = this.state.drag.start;
         }
-        if (this.dragDelta < -0.2) {
+        this.setState({
+            drag: {
+                ...this.state.drag,
+                base: base,
+                start: start,
+                current: x,
+            }
+        });
+    }
+
+    private endDrag() {
+        const delta = this.dragDelta;
+        if (delta < -0.2) {
             this.slide('left');
-        } else if (this.dragDelta > 0.2) {
+        } else if (delta > 0.2) {
             this.slide('right');
         }
         this.setState({ transition: true, drag: null });
+    }
+
+    private cancelDrag() {
+        this.setState({ transition: true, drag: null });
+    }
+
+    private mouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        this.startDrag(e.clientX, null);
+    };
+
+    private mouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        if (this.state.drag === null) {
+            return;
+        }
+        if (this.state.drag.touch !== null) {
+            return;
+        }
+        this.updateDrag(e.clientX);
+    };
+
+    private mouseUp = (e: React.MouseEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        if (this.state.drag === null) {
+            return;
+        }
+        if (this.state.drag.touch !== null) {
+            return;
+        }
+        this.endDrag();
     };
 
     private mouseLeave = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -120,12 +165,64 @@ export class Carousel extends React.Component<Props, State> {
         if (this.state.drag === null) {
             return;
         }
-        if (this.dragDelta < -0.2) {
-            this.slide('left');
-        } else if (this.dragDelta > 0.2) {
-            this.slide('right');
+        this.endDrag();
+    };
+
+    private touchStart = (e: React.TouchEvent<HTMLDivElement>) => {
+        const touches = e.changedTouches;
+        const touch = touches[0];
+        const { clientX, identifier: id } = touch;
+        if (this.state.drag !== null && this.state.drag.touch !== id) {
+            return;
         }
-        this.setState({ transition: true, drag: null });
+        this.startDrag(clientX, id);
+    };
+
+    private touchMove = (e: React.TouchEvent<HTMLDivElement>) => {
+        if (this.state.drag === null) {
+            return;
+        }
+
+        const touches = Array.from(e.changedTouches);
+        for (const touch of touches) {
+            const { clientX, identifier: id } = touch;
+            if (this.state.drag.touch === id) {
+                this.updateDrag(clientX);
+                return;
+            }
+        }
+    };
+
+    private touchEnd = (e: React.TouchEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        if (this.state.drag === null) {
+            return;
+        }
+
+        const touches = Array.from(e.changedTouches);
+        for (const touch of touches) {
+            const { identifier: id } = touch;
+            if (this.state.drag.touch === id) {
+                this.endDrag();
+                return;
+            }
+        }
+    };
+
+    private touchCancel = (e: React.TouchEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        if (this.state.drag === null) {
+            return;
+        }
+
+        const touches = Array.from(e.changedTouches);
+        for (const touch of touches) {
+            const { identifier: id } = touch;
+            if (this.state.drag.touch === id) {
+                this.cancelDrag();
+                return;
+            }
+        }
     };
 
     private processStable = () => {
@@ -168,12 +265,19 @@ export class Carousel extends React.Component<Props, State> {
         return -invertedPos;
     }
 
+    private parameterizedDragDelta(start: number, current: number) {
+        if (this.carouselWindow === null) {
+            return 0;
+        }
+        return -((current - start) / this.carouselWindow.offsetWidth);
+    }
+
     get dragDelta() {
-        if (this.carouselWindow === null || this.state.drag === null) {
+        if (this.state.drag === null) {
             return 0;
         }
         const { start, current } = this.state.drag;
-        return -((current - start) / this.carouselWindow.offsetWidth);
+        return this.parameterizedDragDelta(start, current);
     }
 
     private slide(to: 'left' | 'right') {

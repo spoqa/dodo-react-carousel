@@ -1,11 +1,11 @@
 {
   "compilerOptions": {
-    "jsx": "preserve",
+    "jsx": "react",
     "lib": ["es6", "dom"],
     "moduleResolution": "node",
     "noImplicitAny": true,
     "sourceMap": true,
     "strictNullChecks": true,
-    "target": "es6"
+    "target": "es5"
   }
 }
