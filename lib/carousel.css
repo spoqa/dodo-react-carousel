@@ -8,9 +8,9 @@
 .carousel {
     position: absolute;
     padding: 0;
-    width: 300%;
+    width: 500%;
     height: 100%;
-    left: -100%;
+    left: -200%;
 
     display: flex;
     flex-wrap: nowrap;
@@ -19,17 +19,17 @@
     & > * {
         margin: 0;
         padding: 0;
-        width: calc(100% / 3);
+        width: 20%;
         flex: 0 0 auto;
     }
 }
 .transitionActive {
-    transition: left 1s ease;
+    transition: left 1s ease-out;
 
     &.toLeft {
-        left: 0;
+        left: -100%;
     }
     &.toRight {
-        left: -200%;
+        left: -300%;
     }
 }

@@ -12,6 +12,7 @@ interface State {
     currentIndex: number;
     targetIndex: number;
     slideTo: 'left' | 'right' | null;
+    transition: boolean;
     drag: DragState | null;
 }
 
@@ -23,9 +24,19 @@ export class Carousel extends React.Component<{}, State> {
         if (this.state.drag !== null) {
             console.error('this.state.drag is not null when mouse goes down');
         }
+        let base = this.currentSlidePos;
+        if (base < -0.5) {
+            base += 1;
+            this.setState({ currentIndex: this.state.currentIndex - 1 });
+        } else if (base > 0.5) {
+            base -= 1;
+            this.setState({ currentIndex: this.state.currentIndex + 1 });
+        }
         this.setState({
+            slideTo: null,
+            transition: false,
             drag: {
-                base: this.currentSlidePos,
+                base: base,
                 start: e.clientX,
                 current: e.clientX,
             }
@@ -44,15 +55,19 @@ export class Carousel extends React.Component<{}, State> {
             console.error('this.state.drag is null when mouse goes up');
             return;
         }
-        if (this.dragDelta > 0.2) {
+        if (this.dragDelta < -0.2) {
             this.slide('left');
-        } else if (this.dragDelta < -0.2) {
+        } else if (this.dragDelta > 0.2) {
             this.slide('right');
         }
-        this.setState({ drag: null });
+        this.setState({ transition: true, drag: null });
     };
     recalculate = (e) => {
-        this.setState({ currentIndex: this.state.targetIndex, slideTo: null });
+        this.setState({
+            currentIndex: this.state.targetIndex,
+            slideTo: null,
+            transition: false,
+        });
     };
 
     constructor(props) {
@@ -62,31 +77,38 @@ export class Carousel extends React.Component<{}, State> {
             currentIndex: 0,
             targetIndex: 0,
             slideTo: null,
+            transition: false,
             drag: null,
         };
     }
 
     get displayItemList() {
         const len = this.props.children.length;
+        if (len <= 0) {
+            return [];
+        }
 
         const current = this.state.currentIndex;
-        const left = current - 1;
-        const right = current + 1;
-
-        const idx = [
-            left < 0 ? left+len : left,
-            current,
-            right >= len ? right-len : right,
-        ];
-
-        return idx.map(x => this.props.children[x]);
+        const idxs = new Array(5)
+            .fill(0)
+            .map((_, i) => i - 2 + current)
+            .map(idx => {
+                while (idx < 0) {
+                    idx += len;
+                }
+                while (idx >= len) {
+                    idx -= len;
+                }
+                return idx;
+            });
+        return idxs.map(idx => this.props.children[idx]);
     }
 
     get currentSlidePos() {
         if (this.carouselWindow === null || this.carousel === null) {
             return 0;
         }
-        return this.carousel.offsetLeft / this.carouselWindow.offsetWidth + 1;
+        return -(this.carousel.offsetLeft / this.carouselWindow.offsetWidth + 2);
     }
 
     get dragDelta() {
@@ -94,7 +116,7 @@ export class Carousel extends React.Component<{}, State> {
             return 0;
         }
         const { start, current } = this.state.drag;
-        return (current - start) / this.carouselWindow.offsetWidth;
+        return -((current - start) / this.carouselWindow.offsetWidth);
     }
 
     slide(to: 'left' | 'right') {
@@ -110,31 +132,30 @@ export class Carousel extends React.Component<{}, State> {
         }
         if (newIndex < 0) newIndex += len;
         if (newIndex >= len) newIndex -= len;
-        this.setState({ targetIndex: newIndex, slideTo: to });
+        this.setState({ targetIndex: newIndex, slideTo: to, transition: true });
     }
 
     render() {
-        const animationInProgress = this.state.currentIndex !== this.state.targetIndex;
         const carouselClassList = classNames({
             [carousel]: true,
-            [transitionActive]: animationInProgress,
-            [toLeft]: animationInProgress && this.state.slideTo === 'left',
-            [toRight]: animationInProgress && this.state.slideTo === 'right',
+            [transitionActive]: this.state.transition,
+            [toLeft]: this.state.slideTo === 'left',
+            [toRight]: this.state.slideTo === 'right',
         });
         const dragStyle = {};
         if (this.state.drag !== null) {
             const { base } = this.state.drag;
-            dragStyle.left = `${(base + this.dragDelta - 1) * 100}%`;
+            dragStyle.left = `${(-base - this.dragDelta - 2) * 100}%`;
         }
 
         return (
             <div className={carouselWindow}
+                 onMouseDown={this.startDrag}
+                 onMouseMove={this.updateDrag}
+                 onMouseUp={this.endDrag}
                  ref={el => { this.carouselWindow = el; }}>
                 <div className={carouselClassList}
                      style={dragStyle}
-                     onMouseDown={this.startDrag}
-                     onMouseMove={this.updateDrag}
-                     onMouseUp={this.endDrag}
                      onTransitionEnd={this.recalculate}
                      ref={el => { this.carousel = el; }}>
                     {this.displayItemList}
