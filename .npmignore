@@ -1,0 +1,13 @@
+dist/
+.cache/
+*.log
+
+src/
+example/
+
+.babelrc
+.editorconfig
+
+tsconfig.json
+tsconfig.dist.json
+tslint.json
