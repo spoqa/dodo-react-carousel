@@ -14,6 +14,14 @@ ReactDOM.render(
             <div>
                 Hello, world (2)!
             </div>
+            <div>
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                Nam fermentum, eros vel posuere malesuada, diam.
+            </div>
+            <div>
+                In ultrices porta sapien, nec blandit est semper a.
+                Etiam in gravida enim. Fusce vitae.
+            </div>
         </Carousel>
     </div>,
     content
