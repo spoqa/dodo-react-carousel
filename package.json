@@ -3,14 +3,15 @@
   "version": "0.1.0",
   "description": "A simple React carousel component",
   "main": "lib/index.js",
-  "types": "index.d.ts",
+  "types": "lib.d.ts",
   "author": "Tirr",
   "license": "MIT OR Apache-2.0",
   "scripts": {
     "build": "tsc -p tsconfig.dist.json",
     "start": "parcel example/index.html",
     "lint": "tslint --project .",
-    "typecheck": "tsc --noEmit -p ."
+    "typecheck": "tsc --noEmit -p .",
+    "test": "tslint --project . && tsc --noEmit -p ."
   },
   "dependencies": {
     "@types/react": "^16.0.34",
