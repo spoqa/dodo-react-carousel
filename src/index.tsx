@@ -11,6 +11,7 @@ interface DragState {
     base: number;
     start: number;
     current: number;
+    flick: boolean;
 }
 
 interface State {
@@ -76,8 +77,18 @@ export class Carousel extends React.Component<Props, State> {
 
     private startDrag(x: number, touch: any) {
         let base = this.currentSlidePos;
+        if (base < -0.5) {
+            const idx = this.state.currentIndex - 1;
+            base += 1;
+            this.setState({ currentIndex: idx, targetIndex: idx });
+        } else if (base > 0.5) {
+            const idx = this.state.currentIndex + 1;
+            base -= 1;
+            this.setState({ currentIndex: idx, targetIndex: idx });
+        } else {
+            this.setState({ targetIndex: this.state.currentIndex });
+        }
         this.setState({
-            targetIndex: this.state.currentIndex,
             slideTo: null,
             transition: false,
             drag: {
@@ -85,6 +96,7 @@ export class Carousel extends React.Component<Props, State> {
                 base: base,
                 start: x,
                 current: x,
+                flick: true,
             },
         });
     }
@@ -97,17 +109,19 @@ export class Carousel extends React.Component<Props, State> {
             this.state.drag.base +
             this.parameterizedDragDelta(this.state.drag.start, x);
         let start = x;
-        if (base < -0.9) {
+        let flick = false;
+        if (base < -0.5) {
             const idx = this.state.currentIndex - 1;
             base += 1;
             this.setState({ currentIndex: idx, targetIndex: idx });
-        } else if (base > 0.9) {
+        } else if (base > 0.5) {
             const idx = this.state.currentIndex + 1;
             base -= 1;
             this.setState({ currentIndex: idx, targetIndex: idx });
         } else {
             base = this.state.drag.base;
             start = this.state.drag.start;
+            flick = true;
         }
         this.setState({
             drag: {
@@ -115,15 +129,21 @@ export class Carousel extends React.Component<Props, State> {
                 base: base,
                 start: start,
                 current: x,
-            }
+                flick: this.state.drag.flick && flick,
+            },
         });
     }
 
     private endDrag() {
+        if (this.state.drag === null) {
+            return;
+        }
         const delta = this.dragDelta;
-        if (delta < -0.2) {
+        const pos = this.currentSlidePos;
+        const { flick } = this.state.drag;
+        if ((flick && delta < -0.2) || (!flick && pos < -0.5)) {
             this.slide('left');
-        } else if (delta > 0.2) {
+        } else if ((flick && delta > 0.2) || (!flick && pos > 0.5)) {
             this.slide('right');
         }
         this.setState({ transition: true, drag: null });
