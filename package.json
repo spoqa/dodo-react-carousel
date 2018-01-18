@@ -4,14 +4,20 @@
   "description": "A simple React carousel component",
   "main": "lib/index.js",
   "types": "lib.d.ts",
+  "repository": "github:spoqa/dodo-react-carousel",
   "author": "Tirr",
   "license": "MIT OR Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/spoqa/dodo-react-carousel/issues"
+  },
+  "homepage": "https://github.com/spoqa/dodo-react-carousel#readme",
   "scripts": {
     "build": "tsc -p tsconfig.dist.json",
     "start": "parcel example/index.html",
-    "lint": "tslint --project .",
+    "lint": "tslint -p .",
     "typecheck": "tsc --noEmit -p .",
-    "test": "tslint --project . && tsc --noEmit -p ."
+    "test": "tslint -p . && tsc --noEmit -p .",
+    "prepublish": "tslint -p tsconfig.dist.json && tsc -p tsconfig.dist.json"
   },
   "dependencies": {
     "@types/react": "^16.0.34",
