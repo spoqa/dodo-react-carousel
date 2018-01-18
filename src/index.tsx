@@ -73,7 +73,7 @@ export class Carousel extends React.Component<Props, State> {
         const idx = wrapIndex(props.position, len);
         if (this.state.targetIndex !== idx && this.state.drag === null) {
             if (len > 0) {
-                let distance = wrapIndex(idx - this.state.currentIndex, len);
+                const distance = wrapIndex(idx - this.state.currentIndex, len);
                 if (distance === 1) {
                     // slide to the right
                     this.slide('right');
