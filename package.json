@@ -17,7 +17,7 @@
     "lint": "tslint -p .",
     "typecheck": "tsc --noEmit -p .",
     "test": "tslint -p . && tsc --noEmit -p .",
-    "prepublish": "tslint -p tsconfig.dist.json && tsc -p tsconfig.dist.json"
+    "prepublishOnly": "tslint -p tsconfig.dist.json && tsc -p tsconfig.dist.json"
   },
   "dependencies": {
     "@types/react": "^16.0.34",
