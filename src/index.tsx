@@ -124,7 +124,7 @@ export class Carousel extends React.Component<Props, State> {
         const dragStyle: { left?: string } = {};
         if (this.state.drag !== null) {
             const { base } = this.state.drag;
-            dragStyle.left = `${(-base - this.dragDelta - 2) * 100}%`;
+            dragStyle.left = `${(-base - this.dragDelta - 1) * 100}%`;
         }
 
         return (
@@ -352,10 +352,10 @@ export class Carousel extends React.Component<Props, State> {
         }
 
         const current = this.state.currentIndex;
-        const idxs = new Array(5)
-            .fill(0)
-            .map((_, i) => i - 2 + current)
+        const idxs =
+            [-1, 0, 1]
             .map(idx => {
+                idx += current;
                 while (idx < 0) {
                     idx += len;
                 }
@@ -372,7 +372,7 @@ export class Carousel extends React.Component<Props, State> {
             return 0;
         }
         const invertedPos =
-            this.carousel.offsetLeft / this.carouselWindow.offsetWidth + 2;
+            this.carousel.offsetLeft / this.carouselWindow.offsetWidth + 1;
         return -invertedPos;
     }
 

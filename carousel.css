@@ -8,26 +8,29 @@
 .dodo-carousel {
     position: absolute;
     padding: 0;
-    width: 500%;
+    width: 300%;
     height: 100%;
-    left: -200%;
+    left: -100%;
 
     display: flex;
     flex-wrap: nowrap;
     align-items: stretch;
+
+    will-change: left;
 }
 .dodo-carousel > * {
     margin: 0;
     padding: 0;
-    width: 20%;
+    width: 33.33%;
+    width: calc(100% / 3);
     flex: 0 0 auto;
 }
 .dodo-transition-active {
     transition: left 1s ease-out;
 }
 .dodo-transition-active.dodo-to-left {
-    left: -100%;
+    left: 0%;
 }
 .dodo-transition-active.dodo-to-right {
-    left: -300%;
+    left: -200%;
 }
