@@ -224,9 +224,9 @@ export class Carousel extends React.Component<Props, State> {
         const delta = this.dragDelta;
         const pos = this.currentSlidePos;
         const { flick } = this.state.drag;
-        if ((flick && delta < -0.2) || (!flick && pos < -0.5)) {
+        if ((flick && delta < -0.1) || (!flick && pos < -0.5)) {
             this.slide('left');
-        } else if ((flick && delta > 0.2) || (!flick && pos > 0.5)) {
+        } else if ((flick && delta > 0.1) || (!flick && pos > 0.5)) {
             this.slide('right');
         }
         this.setState({ drag: null });
