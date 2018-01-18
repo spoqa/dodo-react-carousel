@@ -2,6 +2,8 @@ import { Component } from 'react';
 
 interface Props {
     position: number;
+    sensitivity: number;
+    transitionDuration: string;
     onDragStart: () => void;
     onDragEnd: () => void;
     onPositionChange: (position: number) => void;

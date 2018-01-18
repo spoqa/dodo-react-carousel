@@ -5,6 +5,8 @@ import * as React from 'react';
 interface Props {
     children?: any;
     position: number;
+    threshold: number;
+    transitionDuration?: string;
     onDragStart?: () => void;
     onDragEnd?: () => void;
     onPositionChange?: (position: number) => void;
@@ -46,6 +48,8 @@ function wrapIndex(index: number, len: number) {
 export class Carousel extends React.Component<Props, State> {
     public static defaultProps: Partial<Props> = {
         position: 0,
+        threshold: 0.1,
+        // transitionDuration: '1s',
     };
 
     private carouselWindow: HTMLElement | null = null;
@@ -121,7 +125,12 @@ export class Carousel extends React.Component<Props, State> {
             'dodo-to-left': this.state.slideTo === 'left',
             'dodo-to-right': this.state.slideTo === 'right',
         });
-        const dragStyle: { left?: string } = {};
+        const duration =
+            this.state.transition ? this.props.transitionDuration : '';
+        const dragStyle = {
+            left: '',
+            transitionDuration: duration,
+        };
         if (this.state.drag !== null) {
             const { base } = this.state.drag;
             dragStyle.left = `${(-base - this.dragDelta - 1) * 100}%`;
@@ -224,9 +233,10 @@ export class Carousel extends React.Component<Props, State> {
         const delta = this.dragDelta;
         const pos = this.currentSlidePos;
         const { flick } = this.state.drag;
-        if ((flick && delta < -0.1) || (!flick && pos < -0.5)) {
+        const { threshold } = this.props;
+        if ((flick && delta < -threshold) || (!flick && pos < -0.5)) {
             this.slide('left');
-        } else if ((flick && delta > 0.1) || (!flick && pos > 0.5)) {
+        } else if ((flick && delta > threshold) || (!flick && pos > 0.5)) {
             this.slide('right');
         }
         this.setState({ drag: null });
