@@ -4,6 +4,12 @@ import * as React from 'react';
 
 interface Props {
     children?: any;
+    position: number;
+    onDragStart?: () => void;
+    onDragEnd?: () => void;
+    onPositionChange?: (position: number) => void;
+    onUnstable?: () => void;
+    onStable?: (position: number) => void;
 }
 
 interface DragState {
@@ -23,7 +29,25 @@ interface State {
 }
 
 
+function isStateStable(state: State) {
+    return !state.transition && state.drag === null;
+}
+
+function wrapIndex(index: number, len: number) {
+    if (len <= 0) {
+        return 0;
+    }
+    while (index < 0) {
+        index += len;
+    }
+    return index % len;
+}
+
 export class Carousel extends React.Component<Props, State> {
+    public static defaultProps: Partial<Props> = {
+        position: 0,
+    };
+
     private carouselWindow: HTMLElement | null = null;
     private carousel: HTMLElement | null = null;
 
@@ -32,12 +56,62 @@ export class Carousel extends React.Component<Props, State> {
         super(props);
 
         this.state = {
-            currentIndex: 0,
-            targetIndex: 0,
+            currentIndex: props.position,
+            targetIndex: props.position,
             slideTo: null,
             transition: false,
             drag: null,
         };
+    }
+
+    public componentWillReceiveProps(props: Props) {
+        const len = props.children ? props.children.length : 0;
+        const idx = wrapIndex(props.position, len);
+        if (this.state.targetIndex !== idx && this.state.drag === null) {
+            if (len > 0) {
+                let distance = wrapIndex(idx - this.state.currentIndex, len);
+                if (distance === 1) {
+                    // slide to the right
+                    this.slide('right');
+                } else if (distance === len - 1) {
+                    // slide to the left
+                    this.slide('left');
+                } else {
+                    // more than one slide; move immediately
+                    this.setState({
+                        currentIndex: idx,
+                        targetIndex: idx,
+                        slideTo: null,
+                        transition: false,
+                    });
+                }
+            } else {
+                this.setState({
+                    currentIndex: idx,
+                    targetIndex: idx,
+                    slideTo: null,
+                    transition: false,
+                });
+            }
+        }
+    }
+
+    public componentDidUpdate(prevProps: Props, prevState: State) {
+        if (prevState.targetIndex !== this.state.targetIndex) {
+            if (this.props.onPositionChange != null) {
+                this.props.onPositionChange(this.state.targetIndex);
+            }
+        }
+        const isStableBefore = isStateStable(prevState);
+        const isStableNow = isStateStable(this.state);
+        if (isStableBefore !== isStableNow) {
+            if (isStableNow && this.props.onStable != null) {
+                this.props.onStable(this.state.currentIndex);
+            }
+            if (!isStableNow && this.props.onUnstable != null) {
+                this.props.onUnstable();
+            }
+        }
     }
 
     public render() {
@@ -76,19 +150,21 @@ export class Carousel extends React.Component<Props, State> {
 
 
     private startDrag(x: number, touch: any) {
+        const childrenCount =
+            this.props.children ? this.props.children.length : 0;
         let base = this.currentSlidePos;
+        let idx = this.state.currentIndex;
         if (base < -0.5) {
-            const idx = this.state.currentIndex - 1;
+            idx--;
             base += 1;
-            this.setState({ currentIndex: idx, targetIndex: idx });
         } else if (base > 0.5) {
-            const idx = this.state.currentIndex + 1;
+            idx++;
             base -= 1;
-            this.setState({ currentIndex: idx, targetIndex: idx });
-        } else {
-            this.setState({ targetIndex: this.state.currentIndex });
         }
+        idx = wrapIndex(idx, childrenCount);
         this.setState({
+            currentIndex: idx,
+            targetIndex: idx,
             slideTo: null,
             transition: false,
             drag: {
@@ -99,31 +175,38 @@ export class Carousel extends React.Component<Props, State> {
                 flick: true,
             },
         });
+        if (this.props.onDragStart != null) {
+            this.props.onDragStart();
+        }
     }
 
     private updateDrag(x: number) {
         if (this.state.drag === null) {
             return;
         }
+        const childrenCount =
+            this.props.children ? this.props.children.length : 0;
         let base =
             this.state.drag.base +
             this.parameterizedDragDelta(this.state.drag.start, x);
         let start = x;
         let flick = false;
+        let idx = this.state.currentIndex;
         if (base < -0.5) {
-            const idx = this.state.currentIndex - 1;
+            idx--;
             base += 1;
-            this.setState({ currentIndex: idx, targetIndex: idx });
         } else if (base > 0.5) {
-            const idx = this.state.currentIndex + 1;
+            idx++;
             base -= 1;
-            this.setState({ currentIndex: idx, targetIndex: idx });
         } else {
             base = this.state.drag.base;
             start = this.state.drag.start;
             flick = true;
         }
+        idx = wrapIndex(idx, childrenCount);
         this.setState({
+            currentIndex: idx,
+            targetIndex: idx,
             drag: {
                 ...this.state.drag,
                 base: base,
@@ -146,11 +229,20 @@ export class Carousel extends React.Component<Props, State> {
         } else if ((flick && delta > 0.2) || (!flick && pos > 0.5)) {
             this.slide('right');
         }
-        this.setState({ transition: true, drag: null });
+        this.setState({ drag: null });
+        if (pos !== 0) {
+            this.setState({ transition: true });
+        }
+        if (this.props.onDragEnd != null) {
+            this.props.onDragEnd();
+        }
     }
 
     private cancelDrag() {
         this.setState({ transition: true, drag: null });
+        if (this.props.onDragEnd != null) {
+            this.props.onDragEnd();
+        }
     }
 
     private mouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -214,7 +306,6 @@ export class Carousel extends React.Component<Props, State> {
     };
 
     private touchEnd = (e: React.TouchEvent<HTMLDivElement>) => {
-        e.preventDefault();
         if (this.state.drag === null) {
             return;
         }
@@ -230,7 +321,6 @@ export class Carousel extends React.Component<Props, State> {
     };
 
     private touchCancel = (e: React.TouchEvent<HTMLDivElement>) => {
-        e.preventDefault();
         if (this.state.drag === null) {
             return;
         }
@@ -246,8 +336,9 @@ export class Carousel extends React.Component<Props, State> {
     };
 
     private processStable = () => {
+        const idx = this.state.targetIndex;
         this.setState({
-            currentIndex: this.state.targetIndex,
+            currentIndex: idx,
             slideTo: null,
             transition: false,
         });

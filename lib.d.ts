@@ -1,5 +1,12 @@
 import { Component } from 'react';
 
-interface Props {}
+interface Props {
+    position: number;
+    onDragStart: () => void;
+    onDragEnd: () => void;
+    onPositionChange: (position: number) => void;
+    onUnstable: () => void;
+    onStable: (position: number) => void;
+}
 
-declare class Carousel extends Component<Props> {}
+declare class Carousel extends Component<Partial<Props>> {}
