@@ -18,7 +18,7 @@
     "lint": "tslint -p tsconfig.full.json",
     "typecheck": "tsc -p tsconfig.full.json --noEmit",
     "test": "tslint -p tsconfig.full.json && tsc -p tsconfig.full.json --noEmit",
-    "prepublishOnly": "tslint -p tsconfig.full.json && tsc -p tsconfig.full.json"
+    "prepublishOnly": "tslint -p tsconfig.full.json && tsc -p tsconfig.json"
   },
   "dependencies": {
     "classnames": "^2.2.5"
