@@ -14,9 +14,6 @@ ReactDOM.render(
                 Hello, world!
             </div>
             <div>
-                Hello, world (2)!
-            </div>
-            <div>
                 Lorem ipsum dolor sit amet, consectetur adipiscing elit.
                 Nam fermentum, eros vel posuere malesuada, diam.
             </div>
