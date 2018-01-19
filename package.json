@@ -12,12 +12,13 @@
   },
   "homepage": "https://github.com/spoqa/dodo-react-carousel#readme",
   "scripts": {
-    "build": "tsc -p tsconfig.dist.json",
-    "start": "parcel example/index.html",
-    "lint": "tslint -p .",
-    "typecheck": "tsc --noEmit -p .",
-    "test": "tslint -p . && tsc --noEmit -p .",
-    "prepublishOnly": "tslint -p tsconfig.dist.json && tsc -p tsconfig.dist.json"
+    "build": "tsc -p tsconfig.json",
+    "watch": "tsc -p tsconfig.json --watch",
+    "example": "parcel example/index.html",
+    "lint": "tslint -p tsconfig.full.json",
+    "typecheck": "tsc -p tsconfig.full.json --noEmit",
+    "test": "tslint -p tsconfig.full.json && tsc -p tsconfig.full.json --noEmit",
+    "prepublishOnly": "tslint -p tsconfig.full.json && tsc -p tsconfig.full.json"
   },
   "dependencies": {
     "classnames": "^2.2.5"

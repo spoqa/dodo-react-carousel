@@ -1,11 +1,9 @@
 {
+  "extends": "./configs/base",
   "compilerOptions": {
-    "jsx": "react",
-    "lib": ["es6", "dom"],
-    "moduleResolution": "node",
-    "noImplicitAny": true,
-    "sourceMap": true,
-    "strictNullChecks": true,
-    "target": "es5"
-  }
+    "outDir": "lib/"
+  },
+  "include": [
+    "src/**/*"
+  ]
 }
