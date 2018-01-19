@@ -143,9 +143,6 @@ export class Carousel extends React.Component<Props, State> {
                  onMouseUp={this.mouseUp}
                  onMouseLeave={this.mouseLeave}
                  onTouchStart={this.touchStart}
-                 onTouchMove={this.touchMove}
-                 onTouchEnd={this.touchEnd}
-                 onTouchCancel={this.touchCancel}
                  ref={el => this.carouselWindow = el}>
                 <div className={carouselClassList}
                      style={dragStyle}
@@ -291,6 +288,9 @@ export class Carousel extends React.Component<Props, State> {
     };
 
     private touchStart = (e: React.TouchEvent<HTMLDivElement>) => {
+        e.target.addEventListener('touchmove', this.touchMove);
+        e.target.addEventListener('touchend', this.touchEnd);
+        e.target.addEventListener('touchcancel', this.touchCancel);
         const touches = e.changedTouches;
         const touch = touches[0];
         const { clientX, identifier: id } = touch;
@@ -300,7 +300,7 @@ export class Carousel extends React.Component<Props, State> {
         this.startDrag(clientX, id);
     };
 
-    private touchMove = (e: React.TouchEvent<HTMLDivElement>) => {
+    private touchMove = (e: TouchEvent) => {
         if (this.state.drag === null) {
             return;
         }
@@ -315,7 +315,7 @@ export class Carousel extends React.Component<Props, State> {
         }
     };
 
-    private touchEnd = (e: React.TouchEvent<HTMLDivElement>) => {
+    private touchEnd = (e: TouchEvent) => {
         if (this.state.drag === null) {
             return;
         }
@@ -325,12 +325,15 @@ export class Carousel extends React.Component<Props, State> {
             const { identifier: id } = touch;
             if (this.state.drag.touch === id) {
                 this.endDrag();
+                e.target.removeEventListener('touchmove', this.touchMove);
+                e.target.removeEventListener('touchend', this.touchEnd);
+                e.target.removeEventListener('touchcancel', this.touchCancel);
                 return;
             }
         }
     };
 
-    private touchCancel = (e: React.TouchEvent<HTMLDivElement>) => {
+    private touchCancel = (e: TouchEvent) => {
         if (this.state.drag === null) {
             return;
         }
@@ -340,6 +343,9 @@ export class Carousel extends React.Component<Props, State> {
             const { identifier: id } = touch;
             if (this.state.drag.touch === id) {
                 this.cancelDrag();
+                e.target.removeEventListener('touchmove', this.touchMove);
+                e.target.removeEventListener('touchend', this.touchEnd);
+                e.target.removeEventListener('touchcancel', this.touchCancel);
                 return;
             }
         }
