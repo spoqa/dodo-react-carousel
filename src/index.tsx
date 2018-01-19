@@ -362,19 +362,34 @@ export class Carousel extends React.Component<Props, State> {
         }
 
         const current = this.state.currentIndex;
-        const idxs =
-            [-1, 0, 1]
-            .map(idx => {
-                idx += current;
-                while (idx < 0) {
-                    idx += len;
+        const idxs = [-1, 0, 1].map(idx => wrapIndex(idx + current, len));
+        // where copy should occur
+        let copy: number[];
+        if (len === 1) {
+            // second and third element are copied
+            copy = [0, 1, 2];
+        } else if (len === 2) {
+            // the third element is copied
+            copy = [0, 0, 1];
+        } else {
+            // none of the elements are copied
+            copy = [0, 0, 0];
+        }
+        return idxs.map((idx, i) => {
+            const child = children[idx];
+            // We should change the element's key if it is copied
+            if (copy[i] !== 0 && child.key != null) {
+                let suffix;
+                if (copy[i] === 1) {
+                    suffix = 'copy';
+                } else {
+                    suffix = `copy${copy[i]}`;
                 }
-                while (idx >= len) {
-                    idx -= len;
-                }
-                return idx;
-            });
-        return idxs.map(idx => children[idx]);
+                const newKey = `${child.key}-${suffix}`;
+                return React.cloneElement(child, { key: newKey });
+            }
+            return child;
+        });
     }
 
     get currentSlidePos() {
